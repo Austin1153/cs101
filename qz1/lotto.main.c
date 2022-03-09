@@ -70,7 +70,7 @@ int main() {
     scanf("%d",&n);
     
     int count = countf();
-    char name[10]="lotto";
+    char name[14]="lotto    .txt";
     namef(name,count);
     time_t currtime = time(&currtime);
     srand(time(NULL));
