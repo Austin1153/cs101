@@ -1,38 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
-#define Record_in_File "record.bin"
-#define Record_out_File "record.txt"
 
-typedef struct lotto_record {
-    int lotto_no;
-    int lotto_receipt;
-    int emp_id;
-    char lotto_date[12];
-    char lotto_time[10];
-} l_record_t;
-
-typedef struct lotto_statistic {
-    int lotto_no;
-    int lotto_receipt;
-    char lotto_date[12];
-} stat_t;
+typedef struct record {
+  int lotto_no;
+  int lotto_receipt;
+  int lotto_emp_id;
+  char lotto_date[128];
+  char lotto_time[128];
+}typerecord;
 
 int main() {
-    FILE *fp;
-    fp = fopen(Record_in_File,"rb+");
-    l_record_t tmp;
-    stat_t stat[10];
-    int i = 0;
-    while (fread(&tmp,sizeof(l_record_t),1,fp)) {
-        if (stat[i].lotto_date == NULL) {
-            stat[i].lotto_date = tmp.lotto_date;
-        }
-        if (stat[i].lotto_date != tmp.lotto_date) {
-            i++;
-            stat[i].lotto_date = tmp.lotto_date;
-        }
-        stat[i].lotto_no += 1;
-        
-    }
+  FILE* fp, * rfp = fopen("records.bin", "r");
+  char now[9], doi[9] = "";
+  int slots = 0, receipts = 0, tdoi = 1, tslots = 0, treceipts = 0;
+  typerecord record[1];
+  time_t date = time(NULL);
+  srand((unsigned)time(NULL));
+  if (rfp == NULL) {
+    printf("Empty record\nReport will not be generated\n");
+    return 0;
+  } else fp = fopen("report.txt", "w+");
+  fprintf(fp, "========= lotto649 Report =========\n");
+  fprintf(fp, "- Date ------ Num. ------ Receipt -\n");
+  for (int i = 0; fread(record, sizeof(typerecord), sizeof(record) / sizeof(record[0]), rfp); i++) {
+    if (doi[0] == '\0' || strcmp(doi, record[0].lotto_date) == 0) {
+      sprintf(doi, "%s", record[0].lotto_date);
+      slots++;
+      receipts += record[0].lotto_receipt;
+      tslots++;
+      treceipts += record[0].lotto_receipt;
+    } else if (strcmp(doi, record[0].lotto_date) != 0) {
+      fprintf(fp, "%s\t%d/%d\t\t%d\n", doi, slots, receipts / 55, receipts);
+      sprintf(doi, "%s", record[0].lotto_date);
+      slots = 1;
+      receipts = record[0].lotto_receipt;
+      tdoi++;
+      tslots++;
+      treceipts += record[0].lotto_receipt;
+    };
+  };
+  fprintf(fp, "%s\t%d/%d\t\t%d\n", doi, slots, receipts / 55, receipts);
+  fclose(rfp);
+  fprintf(fp, "-----------------------------------\n");
+  fprintf(fp, "       %d\t%d/%d\t\t%d\n", tdoi, tslots, treceipts / 55, treceipts);
+  strftime(now, 100, "%Y%m%d", localtime(&date));
+  fprintf(fp, "======== %s Printed =========\n", now);
+  fclose(fp);
+  return 0;
 }
