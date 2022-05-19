@@ -1,62 +1,49 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-typedef struct node {
-    int head;
-    struct node* next;
-} node_t;
-
-node_t* allocate_node(int data) {
-    node_t* last = (node_t*)calloc(1,sizeof(node_t));
-    last->head = data;
-    return last;
+int do_before_adding(int* i) {
+    int before = *i;
+    *i += 1;
+    return before;
 }
 
-void show_list(node_t* list) {
-    while (list->next) {
-        printf("[%d]->", list->head);
-        list = list->next;
-    }
-    printf("[%d]->", list->head);
-    printf("null\n");
+int do_after_adding(int* i) {
+    *i += 1;
+    return *i;
 }
 
-node_t* append_node(node_t* list, int new_data) {
-    node_t* tmp = list;
-    if (list == NULL) {
-        list = allocate_node(new_data);
-        return list;
-    }
-    while (tmp->next != NULL) {
-        tmp = tmp->next;
-    }
-    tmp->next = allocate_node(new_data);
-    return list;
+void check_result(int x, int z, int t_x, int t_z) {
+    if (x == t_x && z == t_z) 
+        printf(" pass\n");
+    else 
+        printf(" fail\n");
 }
 
-void free_all_node(node_t* list) {
-    node_t* tmp;
-    while(list->next) {
-        tmp = list->next;
-        printf("free([%d])->", list->head);
-        free(list);
-        list = tmp;
-    }
-    printf("free([%d])->", list->head);
-    free(list);
-    printf("null\n");
+void test_do_before_addding() {
+    int x = 1;
+    int z = 5 + do_before_adding(&x);
+    int t_x = 1;
+    int t_z = 5 + t_x++;
+    printf("do_before_adding()\n");
+    printf(" z=%d, x=%d, ", z, x);
+    printf(" t_z=%d, t_x=%d\n", t_z, t_x);
+    check_result(x, z, t_x, t_z);
+}
+
+void test_do_after_adding() {
+    int x = 1;
+    int z = 5 + do_after_adding(&x);
+    int t_x = 1;
+    int t_z = 5 + ++t_x;
+    printf("do_after_adding()\n");
+    printf(" z=%d, x=%d, ", z, x);
+    printf(" t_z=%d, t_x=%d\n", t_z, t_x);
+    check_result(x, z, t_x, t_z);
 }
 
 int main() {
-    node_t* head = NULL;
-    head = append_node(head, 0);
-    show_list(head);
-    head = append_node(head, 11);
-    show_list(head);
-    head = append_node(head, 222);
-    show_list(head);
-    head = append_node(head, 3333);
-    show_list(head);
-    free_all_node(head);
+    printf(" --- fun 1. --- ");
+    test_do_before_addding();
+    printf(" --- fun 2. --- ");
+    test_do_after_adding();
     return 0;
 }
