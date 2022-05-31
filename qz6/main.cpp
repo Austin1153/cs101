@@ -21,7 +21,7 @@ class Clock {
             else meridian = M;
         }
         void display() {
-            cout << Hour << ':' << minute << ':' << second << ' ' << meridian;
+            cout << Hour << ':' << minute << ':' << second << ' ' << meridian << endl;
         }
 };
 
@@ -31,7 +31,7 @@ class StandardClock : Clock {
         void display() {
             if (meridian == "AM") cout << "上午 ";
             else cout << "下午 ";
-            cout << Hour << ':' << minute << ':' << second;
+            cout << Hour << ':' << minute << ':' << second <<endl;
         }
 };
 
@@ -41,7 +41,7 @@ class MilitaryClock : Clock {
         void display() {
             if (meridian == "AM") cout << Hour;
             else cout << Hour + 12;
-            cout << ':' << minute << ':' << second;
+            cout << ':' << minute << ':' << second << endl;
         }
 };
 
